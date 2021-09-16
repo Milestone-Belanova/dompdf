@@ -172,9 +172,9 @@ abstract class AbstractFrameReflower
 
     /**
      * Get the combined (collapsed) length of two adjoining margins.
-     * 
+     *
      * See http://www.w3.org/TR/CSS2/box.html#collapsing-margins.
-     * 
+     *
      * @param number $length1
      * @param number $length2
      * @return number
@@ -190,6 +190,41 @@ abstract class AbstractFrameReflower
         }
         
         return max($length1, $length2);
+    }
+
+    /**
+     * Handle relative positioning according to
+     * https://www.w3.org/TR/CSS21/visuren.html#relative-positioning.
+     *
+     * @param Frame $frame The frame to handle.
+     */
+    protected function position_relative(Frame $frame): void
+    {
+        $style = $frame->get_style();
+
+        if ($style->position === "relative") {
+            $cb = $frame->get_containing_block();
+            $top = $style->length_in_pt($style->top, $cb["h"]);
+            $right = $style->length_in_pt($style->right, $cb["w"]);
+            $bottom = $style->length_in_pt($style->bottom, $cb["h"]);
+            $left = $style->length_in_pt($style->left, $cb["w"]);
+
+            // FIXME RTL case:
+            // if ($left !== "auto" && $right !== "auto") $left = -$right;
+            if ($left === "auto" && $right === "auto") {
+                $left = 0;
+            } elseif ($left === "auto") {
+                $left = -(float) $right;
+            }
+
+            if ($top === "auto" && $bottom === "auto") {
+                $top = 0;
+            } elseif ($top === "auto") {
+                $top = -(float) $bottom;
+            }
+
+            $frame->move((float) $left, (float) $top);
+        }
     }
 
     /**
@@ -224,15 +259,6 @@ abstract class AbstractFrameReflower
 
         $cb_w = $this->_frame->get_containing_block("w");
         $delta = (float)$style->length_in_pt($dims, $cb_w);
-
-        // Handle degenerate case
-        if (!$this->_frame->get_first_child()) {
-            return $this->_min_max_cache = [
-                $delta, $delta,
-                "min" => $delta,
-                "max" => $delta,
-            ];
-        }
 
         $low = [];
         $high = [];

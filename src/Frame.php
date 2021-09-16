@@ -326,7 +326,7 @@ class Frame
         $this->_style = clone $this->_original_style;
 
         // If this represents a generated node then child nodes represent generated content.
-        // Remove the children since the content will be generated next time this frame is reflowed. 
+        // Remove the children since the content will be generated next time this frame is reflowed.
         if ($this->_node->nodeName === "dompdf_generated" && $this->_style->content != "normal") {
             foreach ($this->get_children() as $child) {
                 $this->remove_child($child);
@@ -465,42 +465,12 @@ class Frame
     //........................................................................
 
     /**
-     * Return the height of the margin box of the frame, in pt.  Meaningless
-     * unless the height has been calculated properly.
-     *
-     * @return float
-     */
-    public function get_margin_height()
-    {
-        $style = $this->_style;
-
-        return (
-            (float)$style->length_in_pt(
-                [
-                    $style->height,
-                    (float)$style->length_in_pt(
-                        [
-                            $style->border_top_width,
-                            $style->border_bottom_width,
-                            $style->margin_top,
-                            $style->margin_bottom,
-                            $style->padding_top,
-                            $style->padding_bottom
-                        ], $this->_containing_block["w"]
-                    )
-                ],
-                $this->_containing_block["h"]
-            )
-        );
-    }
-
-    /**
      * Return the width of the margin box of the frame, in pt.  Meaningless
      * unless the width has been calculated properly.
      *
      * @return float
      */
-    public function get_margin_width()
+    public function get_margin_width(): float
     {
         $style = $this->_style;
 
@@ -516,29 +486,30 @@ class Frame
     }
 
     /**
+     * Return the height of the margin box of the frame, in pt.  Meaningless
+     * unless the height has been calculated properly.
+     *
      * @return float
      */
-    public function get_break_margins()
+    public function get_margin_height(): float
     {
         $style = $this->_style;
 
-        return (
-            (float)$style->length_in_pt(
-                [
-                    //$style->height,
-                    (float)$style->length_in_pt(
-                        [
-                            $style->border_top_width,
-                            $style->border_bottom_width,
-                            $style->margin_top,
-                            $style->margin_bottom,
-                            $style->padding_top,
-                            $style->padding_bottom
-                        ], $this->_containing_block["w"]
-                    )
-                ],
-                $this->_containing_block["h"]
-            )
+        return (float)$style->length_in_pt(
+            [
+                $style->height,
+                (float)$style->length_in_pt(
+                    [
+                        $style->border_top_width,
+                        $style->border_bottom_width,
+                        $style->margin_top,
+                        $style->margin_bottom,
+                        $style->padding_top,
+                        $style->padding_bottom
+                    ], $this->_containing_block["w"]
+                )
+            ],
+            $this->_containing_block["h"]
         );
     }
 

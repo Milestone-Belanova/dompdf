@@ -113,7 +113,7 @@ class CPDF implements Canvas
     /**
      * Instance of Cpdf class
      *
-     * @var Cpdf
+     * @var \Dompdf\Cpdf
      */
     protected $_pdf;
 
@@ -203,11 +203,11 @@ class CPDF implements Canvas
         $this->_pdf = new \Dompdf\Cpdf(
             $size,
             true,
-            $dompdf->getOptions()->getFontCache(),
-            $dompdf->getOptions()->getTempDir()
+            $this->_dompdf->getOptions()->getFontCache(),
+            $this->_dompdf->getOptions()->getTempDir()
         );
 
-        $this->_pdf->addInfo("Producer", sprintf("%s + CPDF", $dompdf->version));
+        $this->_pdf->addInfo("Producer", sprintf("%s + CPDF", $this->_dompdf->version));
         $time = substr_replace(date('YmdHisO'), '\'', -2, 0) . '\'';
         $this->_pdf->addInfo("CreationDate", "D:$time");
         $this->_pdf->addInfo("ModDate", "D:$time");
@@ -1021,9 +1021,9 @@ class CPDF implements Canvas
      * @param string $text
      * @param string $font
      * @param float $size
-     * @param int $word_spacing
-     * @param int $char_spacing
-     * @return float|int
+     * @param float $word_spacing
+     * @param float $char_spacing
+     * @return float
      */
     public function get_text_width($text, $font, $size, $word_spacing = 0, $char_spacing = 0)
     {
